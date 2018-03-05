@@ -42,10 +42,10 @@ for i, data_point in enumerate(data_list[4:-1]):
         dx = x[len(x) - 1] - x[len(x) - 2]
         dy = y[len(y) - 1] - y[len(y) - 2]
         dt = t[len(t) - 1] - t[len(t) - 2]
-        if dt is 0:
-            break
-        v_x = dx / h
-        v_y = dy / h
+        if dt == 0 or dt == 0.0:
+            dt = h
+        v_x = dx / dt
+        v_y = dy / dt
         velocity = sqrt(v_x ** 2 + v_y ** 2)
         v.append(velocity)
 
@@ -68,13 +68,24 @@ plt.savefig('plots/' + str(data_number) + '_e.png', bbox_inches='tight')
 plt.close()
 print('Energy plot saved')
 
-fit = np.polyfit(t,np.log(e), 1)
+print('log e', len(np.log(e)), np.log(e))
+print('t', len(t), t)
+
+# Uten log-space:
+fit = np.polyfit(np.array(t), e, 6)
+a = np.polyval(fit, t)
+
+"""
+# Med log-space (funker ikke)
+fit = np.polyfit(np.array(t), np.log(e), 1)
+a = np.exp(fit[1]) * np.exp(fit[0] * np.array(t))
 
 print('fit', fit)
-#a = np.array(np.exp(fit[1]) * np.exp(np.array(t) * float(fit[0])))
-a=np.array(np.exp(fit[1]+fit[0]*np.array(t)))
-print('a', a)
+a = np.array(np.exp(fit[1]) * np.exp(np.array(t) * float(fit[0])))
+# a = np.array(fit[1] + fit[0]*np.array(t))
 
+print('a', a)
+"""
 plt.figure()
 plt.plot(t, a)  # plotting the velocity vs. time: v(t)
 plt.xlabel(r'$t$')
